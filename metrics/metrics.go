@@ -9,7 +9,6 @@ import (
 
 var (
 	Count = prometheus.NewCounterVec(prometheus.CounterOpts{
-		//Because the Name cannot be duplicate, the recommended rule is: "department Name business Name module Name scalar Name type"
 		Name: "request_count",     //Unique id, can't repeat Register(), can Unregister()
 		Help: "App Request Count", //Description of this Counter
 		ConstLabels: prometheus.Labels
