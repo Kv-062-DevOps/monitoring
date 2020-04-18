@@ -34,12 +34,15 @@ func Timer() {
 	timer := prometheus.NewTimer(Latency)
 	defer timer.ObserveDuration()
 }
+
 func PostCount() {
 	Count.With(prometheus.Labels{"app_name": "post-srv", "method": http.Handle, "endpoint": http.Request, "http_status": http.ResponseWriter}).Inc()
 }
+
 func PostHist() {
 	Latency.With(prometheus.Labels{"app_name": "post-srv", "endpoint": http.Request}).Inc()
 }
+
 func Output() {
 	http.Handle("/metrics", promhttp.Handler())
 }
