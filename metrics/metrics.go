@@ -8,16 +8,16 @@ import (
 )
 
 var (
-	MyTestCounter = prometheus.NewCounter(prometheus.CounterOpts{
+	COUNT = prometheus.NewCounter(prometheus.CounterOpts{
 		//Because the Name cannot be duplicate, the recommended rule is: "department Name business Name module Name scalar Name type"
 		Name: "request_count",     //Unique id, can't repeat Register(), can Unregister()
 		Help: "App Request Count", //Description of this Counter
-	})
-	MyTestHistogram = prometheus.NewHistogram(prometheus.HistogramOpts{
+	}), []string{"app_name", "method", "endpoint", "http_status"}
+	LATENCY = prometheus.NewHistogram(prometheus.HistogramOpts{
 		Name:    "request_latency_seconds",
 		Help:    "Request latency",
 		Buckets: prometheus.LinearBuckets(0, 1, 10), //There are 20 first barrels, 5 intervals for each barrel, 5 barrels in total. So 20, 25, 30, 35, 40
-	})
+	}), []string{"app_name", "endpoint"}
 	// MyTestSummary = prometheus.NewSummary(prometheus.SummaryOpts{
 	// 	Name:       "my_test_summary",
 	// 	Help:       "my test summary",
@@ -25,12 +25,12 @@ var (
 	// })
 )
 
-func Collect() {
+func init() {
 
 	//Cannot register Metrics with the same Name more than once
 	//MustRegister registration failure will directly panic(), if you want to capture error, it is recommended to use Register()
-	prometheus.MustRegister(MyTestCounter)
-	prometheus.MustRegister(MyTestHistogram)
+	prometheus.MustRegister(COUNT)
+	prometheus.MustRegister(LATENCY)
 	//prometheus.MustRegister(MyTestSummary)
 
 	// go func() {
@@ -49,10 +49,15 @@ func Collect() {
 }
 
 func Timer() {
-	timer := prometheus.NewTimer(MyTestHistogram)
+	timer := prometheus.NewTimer(LATENCY)
 	defer timer.ObserveDuration()
 }
-
+func Counter_post() {
+	COUNT.With(prometheus.Labels{"app_name": "post-srv", "method": http.Handle, "endpoint": http.Request, "http_status": http.ResponseWriter})
+}
+func Histogram_post() {
+	LATENCY.With(prometheus.Labels{"app_name": "post-srv", "endpoint": http.Request})
+}
 func Output() {
 	http.Handle("/metrics", promhttp.Handler())
 }
