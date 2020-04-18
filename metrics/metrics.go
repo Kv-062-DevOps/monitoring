@@ -8,14 +8,15 @@ import (
 )
 
 var (
-	COUNT = prometheus.NewCounter(prometheus.CounterOpts{
+	COUNT = prometheus.NewCounterVec(prometheus.CounterOpts{
 		//Because the Name cannot be duplicate, the recommended rule is: "department Name business Name module Name scalar Name type"
 		Name: "request_count",     //Unique id, can't repeat Register(), can Unregister()
 		Help: "App Request Count", //Description of this Counter
+		ConstLabels: prometheus.Labels
 	},
 		[]string{"app_name", "method", "endpoint", "http_status"},
 	)
-	LATENCY = prometheus.NewHistogram(prometheus.HistogramOpts{
+	LATENCY = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "request_latency_seconds",
 		Help:    "Request latency",
 		Buckets: prometheus.LinearBuckets(0, 1, 10), //There are 20 first barrels, 5 intervals for each barrel, 5 barrels in total. So 20, 25, 30, 35, 40
