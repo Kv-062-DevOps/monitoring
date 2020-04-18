@@ -31,7 +31,7 @@ func init() {
 }
 
 func Timer() {
-	timer := prometheus.NewTimer(LATENCY)
+	timer := prometheus.NewTimer(Latency)
 	defer timer.ObserveDuration()
 }
 func PostCount() {
