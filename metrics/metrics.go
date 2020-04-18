@@ -9,9 +9,9 @@ import (
 
 var (
 	Count = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "request_count",     //Unique id, can't repeat Register(), can Unregister()
-		Help: "App Request Count", //Description of this Counter
-		ConstLabels: prometheus.Labels
+		Name:        "request_count",     //Unique id, can't repeat Register(), can Unregister()
+		Help:        "App Request Count", //Description of this Counter
+		ConstLabels: prometheus.Labels,
 	},
 		[]string{"app_name", "method", "endpoint", "http_status"},
 	)
@@ -36,10 +36,10 @@ func Timer() {
 	defer timer.ObserveDuration()
 }
 func PostCount() {
-	Count.With(prometheus.Labels{"app_name": "post-srv", "method": http.Handle, "endpoint": http.Request, "http_status": http.ResponseWriter})
+	Count.With(prometheus.Labels{"app_name": "post-srv", "method": http.Handle, "endpoint": http.Request, "http_status": http.ResponseWriter}).Inc()
 }
 func PostHist() {
-	Latency.With(prometheus.Labels{"app_name": "post-srv", "endpoint": http.Request})
+	Latency.With(prometheus.Labels{"app_name": "post-srv", "endpoint": http.Request}).Inc()
 }
 func Output() {
 	http.Handle("/metrics", promhttp.Handler())
