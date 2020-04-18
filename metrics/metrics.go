@@ -12,12 +12,12 @@ var (
 		//Because the Name cannot be duplicate, the recommended rule is: "department Name business Name module Name scalar Name type"
 		Name: "request_count",     //Unique id, can't repeat Register(), can Unregister()
 		Help: "App Request Count", //Description of this Counter
-	}), []string{"app_name", "method", "endpoint", "http_status"}
+	}, []string{"app_name", "method", "endpoint", "http_status"})
 	LATENCY = prometheus.NewHistogram(prometheus.HistogramOpts{
 		Name:    "request_latency_seconds",
 		Help:    "Request latency",
 		Buckets: prometheus.LinearBuckets(0, 1, 10), //There are 20 first barrels, 5 intervals for each barrel, 5 barrels in total. So 20, 25, 30, 35, 40
-	}), []string{"app_name", "endpoint"}
+	}, []string{"app_name", "endpoint"})
 	// MyTestSummary = prometheus.NewSummary(prometheus.SummaryOpts{
 	// 	Name:       "my_test_summary",
 	// 	Help:       "my test summary",
