@@ -23,11 +23,6 @@ var (
 	},
 		[]string{"app_name", "endpoint"},
 	)
-	// MyTestSummary = prometheus.NewSummary(prometheus.SummaryOpts{
-	// 	Name:       "my_test_summary",
-	// 	Help:       "my test summary",
-	// 	Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001}, //Return five, nine, nine
-	// })
 )
 
 func init() {
@@ -36,21 +31,6 @@ func init() {
 	//MustRegister registration failure will directly panic(), if you want to capture error, it is recommended to use Register()
 	prometheus.MustRegister(Count)
 	prometheus.MustRegister(Latency)
-	//prometheus.MustRegister(MyTestSummary)
-
-	// go func() {
-	// 	var i float64
-	// 	for {
-	// 		i++
-	// 		MyTestCounter.Add(10000)                                                  //Constant added each time
-	// 		MyTestHistogram.Observe(30 + math.Floor(120*math.Sin(float64(i)*0.1))/10) //Observe a quantity of 18 - 42 at a time
-	// 		MyTestSummary.Observe(30 + math.Floor(120*math.Sin(float64(i)*0.1))/10)
-
-	// 		time.Sleep(time.Second)
-	// 	}
-	// }()
-	// http.Handle("/metrics", promhttp.Handler())
-	// log.Fatal(http.ListenAndServe("0.0.0.0:8080", nil))//Multiple processes cannot listen to the same port
 }
 
 func Timer() {
@@ -66,37 +46,3 @@ func PostHist() {
 func Output() {
 	http.Handle("/metrics", promhttp.Handler())
 }
-
-// import (
-// 	"github.com/prometheus/client_golang/prometheus"
-// 	"github.com/prometheus/client_golang/prometheus/promhttp"
-// 	"time"
-// )
-
-// var (
-// 	counter = prometheus.NewCounter(
-// 		prometheus.CounterOpts{
-// 			Name: "request_count",
-// 		})
-
-// 	latency = prometheus.Histogram(
-// 		prometheus.HistogramOpts{
-// 			Name:    "request_latency_seconds",
-// 			Buckets: prometheus.LinearBuckets(0, 10, 20),
-// 		})
-// )
-
-// func init() {
-// 	prometheus.MustRegister(counter)
-// 	prometheus.MustRegister(latency)
-
-// }
-// func timer() {
-// 	timer := prometheus.NewTimer(myHistogram)
-// 	defer timer.ObserveDuration()
-// 	// Do actual work.
-// }
-
-// func metrics() {
-
-// }
