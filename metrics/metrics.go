@@ -25,7 +25,6 @@ var (
 )
 
 func init() {
-
 	//Cannot register Metrics with the same Name more than once
 	//MustRegister registration failure will directly panic(), if you want to capture error, it is recommended to use Register()
 	prometheus.MustRegister(Count)
