@@ -9,9 +9,8 @@ import (
 
 var (
 	Count = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name:        "request_count",     //Unique id, can't repeat Register(), can Unregister()
-		Help:        "App Request Count", //Description of this Counter
-		ConstLabels: prometheus.Labels,
+		Name: "request_count",     //Unique id, can't repeat Register(), can Unregister()
+		Help: "App Request Count", //Description of this Counter
 	},
 		[]string{"app_name", "method", "endpoint", "http_status"},
 	)
