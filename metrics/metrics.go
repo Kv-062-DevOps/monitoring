@@ -18,11 +18,11 @@ var (
 		Help:    "Request latency",
 		Buckets: prometheus.LinearBuckets(20, 5, 5), //There are 20 first barrels, 5 intervals for each barrel, 5 barrels in total. So 20, 25, 30, 35, 40
 	})
-	MyTestSummary = prometheus.NewSummary(prometheus.SummaryOpts{
-		Name:       "my_test_summary",
-		Help:       "my test summary",
-		Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001}, //Return five, nine, nine
-	})
+	// MyTestSummary = prometheus.NewSummary(prometheus.SummaryOpts{
+	// 	Name:       "my_test_summary",
+	// 	Help:       "my test summary",
+	// 	Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001}, //Return five, nine, nine
+	// })
 )
 
 func Collect() {
@@ -31,7 +31,7 @@ func Collect() {
 	//MustRegister registration failure will directly panic(), if you want to capture error, it is recommended to use Register()
 	prometheus.MustRegister(MyTestCounter)
 	prometheus.MustRegister(MyTestHistogram)
-	prometheus.MustRegister(MyTestSummary)
+	//prometheus.MustRegister(MyTestSummary)
 
 	// go func() {
 	// 	var i float64
