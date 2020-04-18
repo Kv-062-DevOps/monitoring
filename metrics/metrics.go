@@ -10,12 +10,12 @@ import (
 var (
 	MyTestCounter = prometheus.NewCounter(prometheus.CounterOpts{
 		//Because the Name cannot be duplicate, the recommended rule is: "department Name business Name module Name scalar Name type"
-		Name: "my_test_counter", //Unique id, can't repeat Register(), can Unregister()
-		Help: "my test counter", //Description of this Counter
+		Name: "request_count",     //Unique id, can't repeat Register(), can Unregister()
+		Help: "App Request Count", //Description of this Counter
 	})
 	MyTestHistogram = prometheus.NewHistogram(prometheus.HistogramOpts{
-		Name:    "my_test_histogram",
-		Help:    "my test histogram",
+		Name:    "request_latency_seconds",
+		Help:    "Request latency",
 		Buckets: prometheus.LinearBuckets(20, 5, 5), //There are 20 first barrels, 5 intervals for each barrel, 5 barrels in total. So 20, 25, 30, 35, 40
 	})
 	MyTestSummary = prometheus.NewSummary(prometheus.SummaryOpts{
