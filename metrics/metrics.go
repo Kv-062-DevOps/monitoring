@@ -16,7 +16,7 @@ var (
 	MyTestHistogram = prometheus.NewHistogram(prometheus.HistogramOpts{
 		Name:    "request_latency_seconds",
 		Help:    "Request latency",
-		Buckets: prometheus.LinearBuckets(20, 5, 5), //There are 20 first barrels, 5 intervals for each barrel, 5 barrels in total. So 20, 25, 30, 35, 40
+		Buckets: prometheus.LinearBuckets(0, 1, 10), //There are 20 first barrels, 5 intervals for each barrel, 5 barrels in total. So 20, 25, 30, 35, 40
 	})
 	// MyTestSummary = prometheus.NewSummary(prometheus.SummaryOpts{
 	// 	Name:       "my_test_summary",
