@@ -64,9 +64,10 @@ func newHandlerWithHistogram(handler http.Handler, histogram *prometheus.Histogr
 		start := time.Now()
 		status := http.StatusOK
 		endpoint := req.Host
+		serName := "post-srv"
 
 		defer func() {
-			histogram.WithLabelValues(fmt.Sprintf("%d %s %s", status, "post-srv", endpoint)).Observe(time.Since(start).Seconds())
+			histogram.WithLabelValues(fmt.Sprintf("%d %s %s", status, serName, endpoint)).Observe(time.Since(start).Seconds())
 		}()
 
 		if req.Method == http.MethodGet {
