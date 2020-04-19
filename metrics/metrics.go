@@ -34,11 +34,11 @@ func MeasureTime() http.HandlerFunc {
 		start := time.Now()
 		defer r.Body.Close()
 		code := http.StatusInternalServerError
-		time := Latency.Observe(duration.Seconds()
 
 		defer func() { // Make sure we record a status.
 			duration := time.Since(start)
-			Latency.WithLabelValues(fmt.Sprintf("%d %f", code, time)))
+			time := Latency.Observe(duration.Seconds())
+			Latency.WithLabelValues(fmt.Sprintf("%d %f", code, time))
 		}()
 	}
 }
