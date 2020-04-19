@@ -51,6 +51,7 @@ func PostCount() {
 		Count.With(prometheus.Labels{"app_name": "post-srv", "method": r.Method,
 			"endpoint": r.Host, "http_status": r.Response.Status}).Inc()
 	})
+	return
 }
 
 // func PostHist() {
