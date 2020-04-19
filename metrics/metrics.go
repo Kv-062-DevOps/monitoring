@@ -43,9 +43,9 @@ func MeasureTime() http.HandlerFunc {
 	}
 }
 
-func Counter() {
-	return Count.Inc()
-}
+// func Counter() {
+// 	return Count.Inc()
+// }
 
 // func Collect() http.HandlerFunc {
 // 	return func(w http.ResponseWriter, r *http.Request) {
