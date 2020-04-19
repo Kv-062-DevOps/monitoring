@@ -44,7 +44,7 @@ func Hist() {
 	histogramVec := prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name: "prom_request_time",
 		Help: "Time it has taken to retrieve the metrics",
-	}, []string{"time"})
+	}, []string{"app_name", "status", "endpoint"})
 
 	prometheus.Register(histogramVec)
 
@@ -63,9 +63,10 @@ func newHandlerWithHistogram(handler http.Handler, histogram *prometheus.Histogr
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		start := time.Now()
 		status := http.StatusOK
+		endpoint := http.Request.Host
 
 		defer func() {
-			histogram.WithLabelValues(fmt.Sprintf("%d", status)).Observe(time.Since(start).Seconds())
+			histogram.WithLabelValues(fmt.Sprintf("%d %s %s", status, "post-srv", endpoint)).Observe(time.Since(start).Seconds())
 		}()
 
 		if req.Method == http.MethodGet {
