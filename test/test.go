@@ -13,16 +13,14 @@ import (
 var (
 	counter = prometheus.NewCounter(
 		prometheus.CounterOpts{
-			Namespace: "golang",
-			Name:      "my_counter",
-			Help:      "This is my counter",
+			Name: "request_count",
+			Help: "App Request Count",
 		})
 
 	histogram = prometheus.NewHistogram(
 		prometheus.HistogramOpts{
-			Namespace: "golang",
-			Name:      "my_histogram",
-			Help:      "This is my histogram",
+			Name: "my_histogram",
+			Help: "This is my histogram",
 		})
 )
 
@@ -42,8 +40,8 @@ func Hist() {
 	// rand.Seed(time.Now().Unix())
 
 	histogramVec := prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name: "prom_request_time",
-		Help: "Time it has taken to retrieve the metrics",
+		Name: "request_latency_seconds",
+		Help: "Request latency",
 	}, []string{"app_name", "status", "endpoint"},
 	)
 
