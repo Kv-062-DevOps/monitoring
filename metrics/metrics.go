@@ -1,9 +1,7 @@
 package metrics
 
 import (
-	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -29,19 +27,19 @@ func init() {
 	prometheus.MustRegister(Latency)
 }
 
-func MeasureTime() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
-		defer r.Body.Close()
-		code := http.StatusInternalServerError
+// func MeasureTime() http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		start := time.Now()
+// 		defer r.Body.Close()
+// 		code := http.StatusInternalServerError
 
-		defer func() { // Make sure we record a status.
-			duration := time.Since(start)
-			time := Latency.Observe(duration.Seconds())
-			Latency.WithLabelValues(fmt.Sprintf("%d %f", code, time))
-		}()
-	}
-}
+// 		defer func() { // Make sure we record a status.
+// 			duration := time.Since(start)
+// 			time := Latency.Observe(duration.Seconds())
+// 			Latency.WithLabelValues(fmt.Sprintf("%d %f", code, time))
+// 		}()
+// 	}
+// }
 
 // func Counter() {
 // 	return Count.Inc()

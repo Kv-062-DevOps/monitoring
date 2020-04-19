@@ -33,7 +33,7 @@ func Count() {
 
 	go func() {
 		for {
-			counter.Add(rand.Float64() * 5)
+			counter.Inc()
 		}
 	}()
 }
