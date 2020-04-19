@@ -50,8 +50,8 @@ func Collect() http.HandlerFunc {
 
 		defer func() { // Make sure we record a status.
 			//duration := time.Since(start)
-			Count.With(prometheus.Labels{"app_name": "post-srv", "method": r.Method,
-				"endpoint": r.Host, "http_status": r.Response.Status}).Inc()
+			Count.WithLabelValues("app_name": "post-srv", "method": r.Method,
+				"endpoint": r.Host, "http_status": r.Response.Status)).Inc()
 		}()
 	}
 }
