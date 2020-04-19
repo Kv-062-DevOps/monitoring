@@ -44,7 +44,8 @@ func Hist() {
 	histogramVec := prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name: "prom_request_time",
 		Help: "Time it has taken to retrieve the metrics",
-	}, []string{"app_name", "status", "endpoint"})
+	}, []string{"app_name", "status", "endpoint"},
+	)
 
 	prometheus.Register(histogramVec)
 
