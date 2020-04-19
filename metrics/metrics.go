@@ -46,7 +46,7 @@ func PostCount() {
 
 func PostHist() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		Latency.With(prometheus.Labels{"app_name": "post-srv", "endpoint": r.Host}).Inc()
+		Latency.With(prometheus.Labels{"app_name": "post-srv", "endpoint": r.Host})
 	})
 }
 
