@@ -29,7 +29,7 @@ func init() {
 	prometheus.MustRegister(Latency)
 }
 
-func MeasureTime(Latency *prometheus.HistogramVec) http.HandlerFunc {
+func MeasureTime() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		defer r.Body.Close()
@@ -42,7 +42,7 @@ func MeasureTime(Latency *prometheus.HistogramVec) http.HandlerFunc {
 	}
 }
 
-func Collect(Count *prometheus.CounterVec) http.HandlerFunc {
+func Collect() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		//start := time.Now()
 		defer r.Body.Close()
