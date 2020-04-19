@@ -34,27 +34,32 @@ func MeasureTime() http.HandlerFunc {
 		start := time.Now()
 		defer r.Body.Close()
 		code := http.StatusInternalServerError
+		time := Latency.Observe(duration.Seconds()
 
 		defer func() { // Make sure we record a status.
 			duration := time.Since(start)
-			Latency.WithLabelValues(fmt.Sprintf("%d", code)).Observe(duration.Seconds())
+			Latency.WithLabelValues(fmt.Sprintf("%d %f", code, time)))
 		}()
 	}
 }
 
-func Collect() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		//start := time.Now()
-		defer r.Body.Close()
-		//code := http.StatusInternalServerError
-
-		defer func() { // Make sure we record a status.
-			//duration := time.Since(start)
-			Count.WithLabelValues("app_name": "post-srv", "method": r.Method,
-				"endpoint": r.Host, "http_status": r.Response.Status)).Inc()
-		}()
-	}
+func Counter() {
+	return Count.Inc()
 }
+
+// func Collect() http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		//start := time.Now()
+// 		defer r.Body.Close()
+// 		//code := http.StatusInternalServerError
+
+// 		defer func() { // Make sure we record a status.
+// 			//duration := time.Since(start)
+// 			Count.WithLabelValues("app_name": "post-srv", "method": r.Method,
+// 				"endpoint": r.Host, "http_status": r.Response.Status)).Inc()
+// 		}()
+// 	}
+// }
 
 // func StartTimer() {
 // 	http.Request.StartTime = time.Now()
