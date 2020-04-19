@@ -3,6 +3,7 @@ package test
 import (
 	"math/rand"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -60,7 +61,7 @@ func Hist() {
 func newHandlerWithHistogram(handler http.Handler, histogram *prometheus.HistogramVec) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		start := time.Now()
-		status := http.StatusOK
+		status := strconv.Itoa(http.StatusOK)
 		endpoint := req.Host
 		serName := "post-srv"
 
