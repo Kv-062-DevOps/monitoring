@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -9,38 +10,45 @@ import (
 
 var (
 	Count = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "request_count",     //Unique id, can't repeat Register(), can Unregister()
-		Help: "App Request Count", //Description of this Counter
+		Name: "request_count",
+		Help: "App Request Count",
 	},
 		[]string{"app_name", "method", "endpoint", "http_status"},
 	)
 	Latency = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "request_latency_seconds",
 		Help:    "Request latency",
-		Buckets: prometheus.LinearBuckets(0, 1, 10), //There are 20 first barrels, 5 intervals for each barrel, 5 barrels in total. So 20, 25, 30, 35, 40
+		Buckets: prometheus.LinearBuckets(0, 1, 10),
 	},
 		[]string{"app_name", "endpoint"},
 	)
 )
 
 func init() {
-	//Cannot register Metrics with the same Name more than once
-	//MustRegister registration failure will directly panic(), if you want to capture error, it is recommended to use Register()
 	prometheus.MustRegister(Count)
 	prometheus.MustRegister(Latency)
 }
 
-func Timer() {
-	timer := prometheus.NewTimer(Latency)
-	defer timer.ObserveDuration()
+// func StartTime() {
+// 	var Start = time.Now()
+// }
+
+func MeasureTime() {
+	var Start = time.Now()
+	Latency.Observe(time.Since(Start).Seconds())
 }
 
 func PostCount() {
-	Count.With(prometheus.Labels{"app_name": "post-srv", "method": http.Handle, "endpoint": http.Request, "http_status": http.ResponseWriter}).Inc()
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		Count.With(prometheus.Labels{"app_name": "post-srv", "method": r.Method,
+			"endpoint": r.Host, "http_status": r.Response.Status}).Inc()
+	})
 }
 
 func PostHist() {
-	Latency.With(prometheus.Labels{"app_name": "post-srv", "endpoint": http.Request}).Inc()
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		Latency.With(prometheus.Labels{"app_name": "post-srv", "endpoint": r.Host}).Inc()
+	})
 }
 
 func Output() {
