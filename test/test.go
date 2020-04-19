@@ -30,12 +30,12 @@ func Count() {
 	// rand.Seed(time.Now().Unix())
 
 	prometheus.MustRegister(counter)
-
-	go func() {
-		for {
-			counter.Inc()
-		}
-	}()
+	counter.Inc()
+	// go func() {
+	// 	for {
+	// 		counter.Inc()
+	// 	}
+	// }()
 }
 
 func Hist() {
@@ -52,12 +52,12 @@ func Hist() {
 	http.Handle("/metrics", newHandlerWithHistogram(promhttp.Handler(), histogramVec))
 
 	prometheus.MustRegister(histogram)
-
-	go func() {
-		for {
-			histogram.Observe(rand.Float64() * 10)
-		}
-	}()
+	histogram.Observe(rand.Float64() * 10)
+	// go func() {
+	// 	for {
+	// 		histogram.Observe(rand.Float64() * 10)
+	// 	}
+	// }()
 }
 
 func newHandlerWithHistogram(handler http.Handler, histogram *prometheus.HistogramVec) http.Handler {
