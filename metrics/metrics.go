@@ -35,7 +35,7 @@ func init() {
 
 func MeasureTime() {
 	var Start = time.Now()
-	Latency.Observe(time.Since(Start).Seconds())
+	Latency.Observer(time.Since(Start).Seconds())
 }
 
 func PostCount() {
