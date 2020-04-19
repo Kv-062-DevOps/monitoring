@@ -2,7 +2,6 @@ package metrics
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -33,10 +32,10 @@ func init() {
 // 	var Start = time.Now()
 // }
 
-func MeasureTime() {
-	var Start = time.Now()
-	Latency.Observer(time.Since(Start).Seconds())
-}
+// func MeasureTime() {
+// 	var Start = time.Now()
+// 	Latency.Observer(time.Since(Start).Seconds())
+// }
 
 func PostCount() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
