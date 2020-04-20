@@ -32,7 +32,7 @@ func Count() {
 
 	prometheus.Register(counterVec)
 
-	http.Handle("/metrics", newHandlerWithCounter(promhttp.Handler(), counterVec))
+	http.Handle("/metrics", newHandler(promhttp.Handler(), "counter", counterVec))
 
 	prometheus.MustRegister(counter)
 	counter.Inc()
@@ -47,41 +47,69 @@ func Hist() {
 
 	prometheus.Register(histogramVec)
 
-	http.Handle("/metrics", newHandlerWithHistogram(promhttp.Handler(), histogramVec))
+	http.Handle("/metrics", newHandler(promhttp.Handler(), "histogram", histogramVec))
 
 	prometheus.MustRegister(histogram)
 	histogram.Observe(rand.Float64() * 10)
 }
 
-func newHandlerWithCounter(handler http.Handler, counter *prometheus.CounterVec) http.Handler {
+//func newHandlerWithCounter(handler http.Handler, counter *prometheus.CounterVec) http.Handler {
+//	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+//		status := req.Response.Status
+//		endpoint := req.URL.Path
+//		serName := "post-srv"
+//		method := req.Method
+//
+//		defer func() {
+//			counter.WithLabelValues(serName, method, endpoint, status).Inc()
+//		}()
+//
+//		if req.Method == http.MethodGet {
+//			handler.ServeHTTP(w, req)
+//			return
+//		}
+//	})
+//}
+//
+//func newHandlerWithHistogram(handler http.Handler, histogram *prometheus.HistogramVec) http.Handler {
+//	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+//		start := time.Now()
+//		status := req.Response.Status
+//		endpoint := req.URL.Path
+//		serName := "post-srv"
+//		method := req.Method
+//
+//		defer func() {
+//			histogram.WithLabelValues(serName, method, endpoint, status).Observe(time.Since(start).Seconds())
+//		}()
+//
+//		if req.Method == http.MethodGet {
+//			handler.ServeHTTP(w, req)
+//			return
+//		}
+//	})
+//}
+
+func newHandler(handler http.Handler, what string, object interface{}) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		status := req.Response.Status
+
+		status := http.StatusOK
 		endpoint := req.URL.Path
 		serName := "post-srv"
 		method := req.Method
 
-		defer func() {
-			counter.WithLabelValues(serName, method, endpoint, status).Inc()
-		}()
-
-		if req.Method == http.MethodGet {
-			handler.ServeHTTP(w, req)
-			return
+		if what == "histogram" {
+			start := time.Now()
+			defer func() {
+				object.(*prometheus.HistogramVec).WithLabelValues(serName, method, endpoint, status).Observe(time.Since(start).Seconds())
+			}()
+		} else if what == "counter" {
+			defer func() {
+				object.(*prometheus.CounterVec).WithLabelValues(serName, method, endpoint, status).Inc()
+			}()
+		} else {
+			panic("Type must be either counter or histogram")
 		}
-	})
-}
-
-func newHandlerWithHistogram(handler http.Handler, histogram *prometheus.HistogramVec) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		start := time.Now()
-		status := req.Response.Status
-		endpoint := req.URL.Path
-		serName := "post-srv"
-		method := req.Method
-
-		defer func() {
-			histogram.WithLabelValues(serName, method, endpoint, status).Observe(time.Since(start).Seconds())
-		}()
 
 		if req.Method == http.MethodGet {
 			handler.ServeHTTP(w, req)
