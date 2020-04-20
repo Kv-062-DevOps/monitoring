@@ -33,7 +33,7 @@ func Count() {
 	// )
 
 	// prometheus.MustRegister(counterVec)
-	// req := http.Request()
+	// req := http.Request
 	// status := req.Response.Status
 	// endpoint := req.URL.Path
 	// serName := "post-srv"
