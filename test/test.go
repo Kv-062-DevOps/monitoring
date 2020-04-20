@@ -26,21 +26,21 @@ var (
 func Count() {
 	// rand.Seed(time.Now().Unix())
 
-	counterVec := prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "request_count",
-		Help: "App Request Count",
-	}, []string{"app_name", "method", "endpoint", "http_status"},
-	)
+	// counterVec := prometheus.NewCounterVec(prometheus.CounterOpts{
+	// 	Name: "request_count",
+	// 	Help: "App Request Count",
+	// }, []string{"app_name", "method", "endpoint", "http_status"},
+	// )
 
-	prometheus.MustRegister(counterVec)
-	req := http.Request()
-	status := req.Response.Status
-	endpoint := req.URL.Path
-	serName := "post-srv"
-	method := req.Method
-	defer func() {
-		counterVec.WithLabelValues(serName, method, endpoint, status).Inc()
-	}()
+	// prometheus.MustRegister(counterVec)
+	// req := http.Request()
+	// status := req.Response.Status
+	// endpoint := req.URL.Path
+	// serName := "post-srv"
+	// method := req.Method
+	// defer func() {
+	// 	counterVec.WithLabelValues(serName, method, endpoint, status).Inc()
+	// }()
 	//http.Handle("/metrics", newHandlerWithCounter(promhttp.Handler(), counterVec))
 
 	prometheus.MustRegister(counter)
@@ -58,7 +58,7 @@ func Hist() {
 	histogramVec := prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name: "request_latency_seconds",
 		Help: "Request latency",
-	}, []string{"app_name", "endpoint"},
+	}, []string{"app_name", "method", "endpoint", "http_status"},
 	)
 
 	prometheus.Register(histogramVec)
@@ -99,12 +99,13 @@ func Hist() {
 func newHandlerWithHistogram(handler http.Handler, histogram *prometheus.HistogramVec) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		start := time.Now()
-		//status := req.Response.Status
+		status := req.Response.Status
 		endpoint := req.URL.Path
 		serName := "post-srv"
+		method := req.Method
 
 		defer func() {
-			histogram.WithLabelValues(serName, endpoint).Observe(time.Since(start).Seconds())
+			histogram.WithLabelValues(serName, method, endpoint, status).Observe(time.Since(start).Seconds())
 		}()
 
 		if req.Method == http.MethodGet {
