@@ -1,7 +1,6 @@
 package metrics
 
 import (
-	"math/rand"
 	"net/http"
 	"time"
 
@@ -22,6 +21,11 @@ var (
 			Name:      "my_histogram",
 			Help:      "This is my histogram",
 		})
+	HistogramVec = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		Name: "request_latency_seconds",
+		Help: "Request latency",
+	}, []string{"app_name", "method", "endpoint", "http_status"},
+	)
 )
 
 func Count() {
@@ -30,18 +34,13 @@ func Count() {
 }
 
 func Hist() {
-	histogramVec := prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name: "request_latency_seconds",
-		Help: "Request latency",
-	}, []string{"app_name", "method", "endpoint", "http_status"},
-	)
 
-	prometheus.Register(histogramVec)
+	prometheus.Register(HistogramVec)
 
-	http.Handle("/metrics", newHandlerWithHistogram(promhttp.Handler(), histogramVec))
-
+	//http.Handle("/metrics", newHandlerWithHistogram(promhttp.Handler(), histogramVec))
+	http.Handle("/metrics", promhttp.Handler())
 	prometheus.MustRegister(histogram)
-	histogram.Observe(rand.Float64() * 10)
+	//histogram.Observe(rand.Float64() * 10)
 }
 
 func newHandlerWithHistogram(handler http.Handler, histogram *prometheus.HistogramVec) http.Handler {
