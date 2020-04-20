@@ -1,4 +1,4 @@
-package test
+package exporter
 
 import (
 	"math/rand"
