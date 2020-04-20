@@ -78,6 +78,9 @@ func newHandlerWithCounter(handler http.Handler, counter *prometheus.CounterVec,
 
 		defer func() {
 			counter.WithLabelValues(serName, method, endpoint, status).Inc()
+		}()
+
+		defer func() {
 			histogram.WithLabelValues(serName, endpoint).Observe(time.Since(start).Seconds())
 		}()
 
