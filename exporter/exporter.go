@@ -30,15 +30,8 @@ func Count() {
 	}, []string{"app_name", "method", "endpoint", "http_status"},
 	)
 
-	prometheus.MustRegister(counterVec)
-	req := http.Request
-	status := req.Response.Status
-	endpoint := req.URL.Path
-	serName := "post-srv"
-	method := req.Method
-	defer func() {
-		counterVec.WithLabelValues(serName, method, endpoint, status).Inc()
-	}()
+	prometheus.Register(counterVec)
+
 	http.Handle("/metrics", newHandlerWithCounter(promhttp.Handler(), counterVec))
 
 	prometheus.MustRegister(counter)
@@ -58,6 +51,24 @@ func Hist() {
 
 	prometheus.MustRegister(histogram)
 	histogram.Observe(rand.Float64() * 10)
+}
+
+func newHandlerWithCounter(handler http.Handler, counter *prometheus.CounterVec) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		status := req.Response.Status
+		endpoint := req.URL.Path
+		serName := "post-srv"
+		method := req.Method
+
+		defer func() {
+			counter.WithLabelValues(serName, method, endpoint, status).Inc()
+		}()
+
+		if req.Method == http.MethodGet {
+			handler.ServeHTTP(w, req)
+			return
+		}
+	})
 }
 
 func newHandlerWithHistogram(handler http.Handler, histogram *prometheus.HistogramVec) http.Handler {
