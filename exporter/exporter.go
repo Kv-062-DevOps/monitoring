@@ -42,7 +42,7 @@ func Hist() {
 	histogramVec := prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name: "request_latency_seconds",
 		Help: "Request latency",
-	}, []string{"app_name", "method", "endpoint", "http_status"},
+	}, []string{"app_name", "endpoint"},
 	)
 
 	prometheus.Register(histogramVec)
@@ -93,7 +93,7 @@ func Hist() {
 func newHandler(handler http.Handler, what string, object interface{}) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 
-		status := http.StatusOK
+		status := string(req.Response.Status)
 		endpoint := req.URL.Path
 		serName := "post-srv"
 		method := req.Method
@@ -101,7 +101,7 @@ func newHandler(handler http.Handler, what string, object interface{}) http.Hand
 		if what == "histogram" {
 			start := time.Now()
 			defer func() {
-				object.(*prometheus.HistogramVec).WithLabelValues(serName, method, endpoint, status).Observe(time.Since(start).Seconds())
+				object.(*prometheus.HistogramVec).WithLabelValues(serName, endpoint).Observe(time.Since(start).Seconds())
 			}()
 		} else if what == "counter" {
 			defer func() {
