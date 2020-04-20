@@ -46,6 +46,7 @@ func Hist() {
 
 func newHandlerWithHistogram(handler http.Handler, histogram *prometheus.HistogramVec) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		start := time.Now()
 		status := req.Response.Status
 		endpoint := req.URL.Path
 		serName := "post-srv"
@@ -55,12 +56,12 @@ func newHandlerWithHistogram(handler http.Handler, histogram *prometheus.Histogr
 			histogram.WithLabelValues(serName, method, endpoint, status).Observe(time.Since(start).Seconds())
 		}()
 
-		if req.Method == http.MethodGet {
-			handler.ServeHTTP(w, req)
-			return
-		}
-		status = http.StatusBadRequest
+	// 	if req.Method == http.MethodGet {
+	// 		handler.ServeHTTP(w, req)
+	// 		return
+	// 	}
+	// 	status = http.StatusBadRequest
 
-		w.WriteHeader(status)
-	})
+	// 	w.WriteHeader(status)
+	// })
 }
