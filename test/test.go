@@ -112,7 +112,7 @@ func newHandlerWithHistogram(handler http.Handler, histogram *prometheus.Histogr
 }
 
 func Output() {
-	mux := http.ServeMux
+	mux := http.NewServeMux()
 	mux.Handle("/metrics", newHandlerWithCounter(promhttp.Handler(), Count.counterVec))
-	http.Handle("/metrics", newHandlerWithHistogram(promhttp.Handler(), Hist.histogramVec))
+	mux.Handle("/metrics", newHandlerWithHistogram(promhttp.Handler(), Hist.histogramVec))
 }
