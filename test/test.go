@@ -3,7 +3,6 @@ package test
 import (
 	"math/rand"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -42,7 +41,7 @@ func Hist() {
 	histogramVec := prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name: "request_latency_seconds",
 		Help: "Request latency",
-	}, []string{"app_name", "status", "endpoint"},
+	}, []string{"app_name", "endpoint"},
 	)
 
 	prometheus.Register(histogramVec)
@@ -61,18 +60,19 @@ func Hist() {
 func newHandlerWithHistogram(handler http.Handler, histogram *prometheus.HistogramVec) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		start := time.Now()
-		status := strconv.Itoa(http.StatusOK)
+		status := http.StatusOK
 		endpoint := req.Host
 		serName := "post-srv"
 
 		defer func() {
-			histogram.WithLabelValues(serName, status, endpoint).Observe(time.Since(start).Seconds())
+			histogram.WithLabelValues(serName, endpoint).Observe(time.Since(start).Seconds())
 		}()
 
 		if req.Method == http.MethodGet {
 			handler.ServeHTTP(w, req)
 			return
 		}
+
 		status = http.StatusBadRequest
 
 		w.WriteHeader(status)
