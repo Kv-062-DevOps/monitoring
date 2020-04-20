@@ -1,6 +1,7 @@
 package exporter
 
 import (
+	"fmt"
 	"math/rand"
 	"net/http"
 	"time"
@@ -12,8 +13,8 @@ import (
 var (
 	counter = prometheus.NewCounter(
 		prometheus.CounterOpts{
-			Name: "request_Count",
-			Help: "App Request Counter",
+			Name: "my_counter",
+			Help: "This is my counter",
 		})
 
 	histogram = prometheus.NewHistogram(
@@ -93,11 +94,11 @@ func Hist() {
 func newHandler(handler http.Handler, what string, object interface{}) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 
-		status := string(req.Response.Status)
+		status := req.Response.Status
+		fmt.Println(status)
 		endpoint := req.URL.Path
 		serName := "post-srv"
 		method := req.Method
-
 		if what == "histogram" {
 			start := time.Now()
 			defer func() {

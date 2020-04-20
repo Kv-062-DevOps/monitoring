@@ -1,90 +1,66 @@
 package metrics
 
 import (
+	"fmt"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var (
-	Count = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "request_count",
-		Help: "App Request Count",
-	},
-		[]string{"app_name", "method", "endpoint", "http_status"},
-	)
-	Latency = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name: "request_latency_seconds",
-		Help: "Request latency",
-	},
-		[]string{"app_name", "endpoint"},
-	)
+	counter = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Namespace: "golang",
+			Name:      "my_counter",
+			Help:      "This is my counter",
+		})
+
+	histogram = prometheus.NewHistogram(
+		prometheus.HistogramOpts{
+			Namespace: "golang",
+			Name:      "my_histogram",
+			Help:      "This is my histogram",
+		})
 )
 
-func init() {
-	prometheus.MustRegister(Count)
-	prometheus.MustRegister(Latency)
+func Count() {
+	prometheus.MustRegister(counter)
+	counter.Inc()
 }
 
-// func MeasureTime() http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		start := time.Now()
-// 		defer r.Body.Close()
-// 		code := http.StatusInternalServerError
+func Hist() {
+	histogramVec := prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		Name: "request_latency_seconds",
+		Help: "Request latency",
+	}, []string{"app_name", "status"},
+	)
 
-// 		defer func() { // Make sure we record a status.
-// 			duration := time.Since(start)
-// 			time := Latency.Observe(duration.Seconds())
-// 			Latency.WithLabelValues(fmt.Sprintf("%d %f", code, time))
-// 		}()
-// 	}
-// }
+	prometheus.Register(histogramVec)
 
-// func Counter() {
-// 	return Count.Inc()
-// }
+	http.Handle("/metrics", newHandlerWithHistogram(promhttp.Handler(), histogramVec))
 
-// func Collect() http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		//start := time.Now()
-// 		defer r.Body.Close()
-// 		//code := http.StatusInternalServerError
+	prometheus.MustRegister(histogram)
+	histogram.Observe(rand.Float64() * 10)
+}
 
-// 		defer func() { // Make sure we record a status.
-// 			//duration := time.Since(start)
-// 			Count.WithLabelValues("app_name": "post-srv", "method": r.Method,
-// 				"endpoint": r.Host, "http_status": r.Response.Status)).Inc()
-// 		}()
-// 	}
-// }
+func newHandlerWithHistogram(handler http.Handler, histogram *prometheus.HistogramVec) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		start := time.Now()
+		status := http.StatusOK
 
-// func StartTimer() {
-// 	http.Request.StartTime = time.Now()
-// }
+		defer func() {
+			histogram.WithLabelValues(fmt.Sprintf("%d", status)).Observe(time.Since(start).Seconds())
+		}()
 
-// func StartTime() {
-// 	var Start = time.Now()
-// }
+		if req.Method == http.MethodGet {
+			handler.ServeHTTP(w, req)
+			return
+		}
+		status = http.StatusBadRequest
 
-// func MeasureTime() {
-// 	var Start = time.Now()
-// 	Latency.Observer(time.Since(Start).Seconds())
-// }
-
-// func PostCount() {
-// 	http.HandleFunc("/metrics", func(w http.ResponseWriter, r *http.Request) {
-// 		Count.With(prometheus.Labels{"app_name": "post-srv", "method": r.Method,
-// 			"endpoint": r.Host, "http_status": r.Response.Status}).Inc()
-// 	})
-// }
-
-// func PostHist() {
-// 	http.HandleFunc("/metrics", func(w http.ResponseWriter, r *http.Request) {
-// 		Latency.With(prometheus.Labels{"app_name": "post-srv", "endpoint": r.Host})
-// 	})
-// }
-
-func Output() {
-	http.Handle("/metrics", promhttp.Handler())
+		w.WriteHeader(status)
+	})
 }
