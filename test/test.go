@@ -56,7 +56,7 @@ func Hist() {
 
 	prometheus.Register(histogramVec)
 
-	http.Handle("/metrics", newHandlerWithHistogram(promhttp.Handler(), histogramVec))
+	newHandlerWithHistogram(promhttp.Handler(), histogramVec)
 
 	prometheus.MustRegister(histogram)
 	histogram.Observe(rand.Float64() * 10)
