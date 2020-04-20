@@ -2,7 +2,6 @@ package metrics
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -38,29 +37,33 @@ func Hist() {
 	prometheus.Register(HistogramVec)
 
 	//http.Handle("/metrics", newHandlerWithHistogram(promhttp.Handler(), histogramVec))
-	http.Handle("/metrics", promhttp.Handler())
+
 	prometheus.MustRegister(histogram)
 	//histogram.Observe(rand.Float64() * 10)
 }
 
-func newHandlerWithHistogram(handler http.Handler, histogram *prometheus.HistogramVec) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		start := time.Now()
-		status := req.Response.Status
-		endpoint := req.URL.Path
-		serName := "post-srv"
-		method := req.Method
-
-		defer func() {
-			histogram.WithLabelValues(serName, method, endpoint, status).Observe(time.Since(start).Seconds())
-		}()
-
-		// if req.Method == http.MethodGet {
-		// 	handler.ServeHTTP(w, req)
-		// 	return
-		// }
-		// status = http.StatusBadRequest
-
-		// w.WriteHeader(status)
-	})
+func Output() {
+	http.Handle("/metrics", promhttp.Handler())
 }
+
+// func newHandlerWithHistogram(handler http.Handler, histogram *prometheus.HistogramVec) http.Handler {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+// 		//start := time.Now()
+// 		// status := req.Response.Status
+// 		// endpoint := req.URL.Path
+// 		// serName := "post-srv"
+// 		// method := req.Method
+
+// 		defer func() {
+// 			histogram.WithLabelValues(serName, method, endpoint, status).Observe(time.Since(start).Seconds())
+// 		}()
+
+// if req.Method == http.MethodGet {
+// 	handler.ServeHTTP(w, req)
+// 	return
+// }
+// status = http.StatusBadRequest
+
+// w.WriteHeader(status)
+// 	})
+// }
