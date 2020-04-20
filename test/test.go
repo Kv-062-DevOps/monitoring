@@ -12,8 +12,8 @@ import (
 var (
 	counter = prometheus.NewCounter(
 		prometheus.CounterOpts{
-			Name: "request_count",
-			Help: "App Request Count",
+			Name: "request_Count",
+			Help: "App Request Counter",
 		})
 
 	histogram = prometheus.NewHistogram(
