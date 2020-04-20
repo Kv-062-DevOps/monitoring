@@ -1,7 +1,6 @@
 package metrics
 
 import (
-	"fmt"
 	"math/rand"
 	"net/http"
 	"time"
@@ -34,7 +33,7 @@ func Hist() {
 	histogramVec := prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name: "request_latency_seconds",
 		Help: "Request latency",
-	}, []string{"app_name", "status"},
+	}, []string{"app_name", "method", "endpoint", "http_status"},
 	)
 
 	prometheus.Register(histogramVec)
@@ -47,12 +46,13 @@ func Hist() {
 
 func newHandlerWithHistogram(handler http.Handler, histogram *prometheus.HistogramVec) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		start := time.Now()
-		status := http.StatusOK
+		status := req.Response.Status
+		endpoint := req.URL.Path
 		serName := "post-srv"
+		method := req.Method
 
 		defer func() {
-			histogram.WithLabelValues(serName, fmt.Sprintf("%d", status)).Observe(time.Since(start).Seconds())
+			histogram.WithLabelValues(serName, method, endpoint, status).Observe(time.Since(start).Seconds())
 		}()
 
 		if req.Method == http.MethodGet {
