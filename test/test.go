@@ -21,7 +21,6 @@ var (
 			Name: "my_histogram",
 			Help: "This is my histogram",
 		})
-	mux = http.NewServeMux()
 )
 
 func Count() {
@@ -35,7 +34,7 @@ func Count() {
 
 	prometheus.Register(counterVec)
 
-	mux.Handle("/metrics", newHandlerWithCounter(promhttp.Handler(), counterVec))
+	// http.Handle("/metrics", newHandlerWithCounter(promhttp.Handler(), counterVec))
 
 	prometheus.MustRegister(counter)
 	counter.Inc()
@@ -57,7 +56,7 @@ func Hist() {
 
 	prometheus.Register(histogramVec)
 
-	mux.Handle("/metrics", newHandlerWithHistogram(promhttp.Handler(), histogramVec))
+	// http.Handle("/metrics", newHandlerWithHistogram(promhttp.Handler(), histogramVec))
 
 	prometheus.MustRegister(histogram)
 	histogram.Observe(rand.Float64() * 10)
@@ -110,4 +109,10 @@ func newHandlerWithHistogram(handler http.Handler, histogram *prometheus.Histogr
 
 		// w.WriteHeader(status)
 	})
+}
+
+func Output() {
+	mux := http.ServeMux
+	mux.Handle("/metrics", newHandlerWithCounter(promhttp.Handler(), Count.counterVec))
+	http.Handle("/metrics", newHandlerWithHistogram(promhttp.Handler(), Hist.histogramVec))
 }
