@@ -13,9 +13,8 @@ import (
 var (
 	counter = prometheus.NewCounter(
 		prometheus.CounterOpts{
-			Namespace: "golang",
-			Name:      "my_counter",
-			Help:      "This is my counter",
+			Name: "app_name",
+			Help: "request_app_counter",
 		})
 
 	histogram = prometheus.NewHistogram(
