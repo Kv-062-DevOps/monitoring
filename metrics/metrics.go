@@ -2,44 +2,60 @@ package metrics
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var (
-	counter = prometheus.NewCounter(
-		prometheus.CounterOpts{
-			Name: "app_name",
-			Help: "request_app_counter",
-		})
-
-	histogram = prometheus.NewHistogram(
-		prometheus.HistogramOpts{
-			Namespace: "golang",
-			Name:      "my_histogram",
-			Help:      "This is my histogram",
-		})
+	CounterVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: "request_count",
+		Help: "App Request Count",
+	}, []string{"app_name", "method", "endpoint", "http_status"},
+	)
 	HistogramVec = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name: "request_latency_seconds",
 		Help: "Request latency",
-	}, []string{"app_name", "method", "endpoint", "http_status"},
+	}, []string{"app_name", "endpoint"},
 	)
+	req = http.Request
 )
 
-func Count() {
-	prometheus.MustRegister(counter)
-	counter.Inc()
+func CountRegister() {
+	prometheus.Register(CounterVec)
 }
 
-func Hist() {
-
+func HistRegister() {
 	prometheus.Register(HistogramVec)
+}
 
-	//http.Handle("/metrics", newHandlerWithHistogram(promhttp.Handler(), histogramVec))
+func Init() {
+	start := time.Now()
+	status := ""
+	endpoint := req.URL.Path
+	serName := "post-srv"
+	method := req.Method
 
-	prometheus.MustRegister(histogram)
-	//histogram.Observe(rand.Float64() * 10)
+}
+
+func CountCollect() {
+	Init()
+	defer func() {
+		CounterVec.WithLabelValues(serName, method, endpoint, status).Inc()
+	}()
+}
+
+func HistCollect() {
+	Init()
+	defer func() {
+		HistogramVec.WithLabelValues(serName, endpoint).Observe(time.Since(start).Seconds())
+	}()
+
+}
+
+func StatusCollect() {
+	status := Status
 }
 
 func Output() {
