@@ -36,7 +36,7 @@ func Init(req *http.Request) {
 }
 
 func Collect() {
-	Init()
+	Init(*http.Request)
 	CounterVec.WithLabelValues(serName, method, endpoint, status).Inc()
 	HistogramVec.WithLabelValues(serName, endpoint).Observe(time.Since(start).Seconds())
 }
