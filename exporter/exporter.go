@@ -19,19 +19,14 @@ var (
 		Help: "Request latency",
 	}, []string{"app_name", "endpoint"},
 	)
-	req  = http.Request
-	resp = req.Response
 )
 
-func CountRegister() {
+func RegisterMetrics() {
 	prometheus.Register(CounterVec)
-}
-
-func HistRegister() {
 	prometheus.Register(HistogramVec)
 }
 
-func Init() {
+func Init(req *http.Request) {
 	start := time.Now()
 	status := ""
 	endpoint := req.URL.Path
@@ -40,24 +35,15 @@ func Init() {
 
 }
 
-func CountCollect() {
-	Init()
-	defer func() {
-		status = req.Response.Status
-		CounterVec.WithLabelValues(serName, method, endpoint, status).Inc()
-	}()
-}
-
-func HistCollect() {
-	Init()
-	defer func() {
-		HistogramVec.WithLabelValues(serName, endpoint).Observe(time.Since(start).Seconds())
-	}()
-
+func Collect() {
+	Init(req)
+	CounterVec.WithLabelValues(serName, method, endpoint, status).Inc()
+	HistogramVec.WithLabelValues(serName, endpoint).Observe(time.Since(start).Seconds())
 }
 
 func StatusCollect() {
-	status := resp.Status
+	Init(req)
+	status = req.resp.Status
 }
 
 func Output() {
