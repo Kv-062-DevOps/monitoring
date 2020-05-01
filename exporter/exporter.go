@@ -19,7 +19,8 @@ var (
 		Help: "Request latency",
 	}, []string{"app_name", "endpoint"},
 	)
-	req = http.Request
+	req  = http.Request
+	resp = req.Response
 )
 
 func CountRegister() {
@@ -42,6 +43,7 @@ func Init() {
 func CountCollect() {
 	Init()
 	defer func() {
+		status = req.Response.Status
 		CounterVec.WithLabelValues(serName, method, endpoint, status).Inc()
 	}()
 }
@@ -55,7 +57,7 @@ func HistCollect() {
 }
 
 func StatusCollect() {
-	status := Status
+	status := resp.Status
 }
 
 func Output() {
