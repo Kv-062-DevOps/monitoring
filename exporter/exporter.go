@@ -1,4 +1,4 @@
-package metrics
+package exporter
 
 import (
 	"net/http"
@@ -19,7 +19,8 @@ var (
 		Help: "Request latency",
 	}, []string{"app_name", "endpoint"},
 	)
-	status, endpoint, serName, method string = "", "", "", ""
+	status, endpoint, serName, method string  = "", "", "", ""
+	start                             float64 = 1
 )
 
 func RegisterMetrics() {
@@ -27,26 +28,38 @@ func RegisterMetrics() {
 	prometheus.Register(HistogramVec)
 }
 
-func Init() {
+func InitCounter() {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		start = time.Now()
-		status = ""
-		endpoint = req.URL.Path
 		serName = "post-srv"
 		method = req.Method
-
+		endpoint = req.URL.Path
+		status = ""
 	})
 }
 
-func Collect() {
-	Init()
+func InitHist() {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		serName = "post-srv"
+		endpoint = req.URL.Path
+	})
+}
+
+func CollectCount() {
+	InitCounter()
 	CounterVec.WithLabelValues(serName, method, endpoint, status).Inc()
+}
+
+func CollectHist() {
+	InitHist()
 	HistogramVec.WithLabelValues(serName, endpoint).Observe(time.Since(start).Seconds())
 }
 
 func StatusCollect() {
-	Init()
-	status = req.resp.Status
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		status = req.Response.Status
+	})
+
 }
 
 func Output() {
