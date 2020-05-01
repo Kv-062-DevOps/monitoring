@@ -19,8 +19,7 @@ var (
 		Help: "Request latency",
 	}, []string{"app_name", "endpoint"},
 	)
-	status, endpoint, serName, method string  = "", "", "", ""
-	start                             float64 = 1
+	status, endpoint, serName, method string = "", "", "", ""
 )
 
 func RegisterMetrics() {
@@ -29,7 +28,7 @@ func RegisterMetrics() {
 }
 
 func InitCounter() {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		start = time.Now()
 		serName = "post-srv"
 		method = req.Method
@@ -39,7 +38,7 @@ func InitCounter() {
 }
 
 func InitHist() {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		serName = "post-srv"
 		endpoint = req.URL.Path
 	})
@@ -56,7 +55,7 @@ func CollectHist() {
 }
 
 func StatusCollect() {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		status = req.Response.Status
 	})
 
