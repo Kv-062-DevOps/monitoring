@@ -19,6 +19,7 @@ var (
 		Help: "Request latency",
 	}, []string{"app_name", "endpoint"},
 	)
+	status, endpoint, serName, method string = "", "", "", ""
 )
 
 func RegisterMetrics() {
@@ -26,13 +27,15 @@ func RegisterMetrics() {
 	prometheus.Register(HistogramVec)
 }
 
-func Init(req *http.Request) {
-	start = time.Now()
-	status = ""
-	endpoint = req.URL.Path
-	serName = "post-srv"
-	method = req.Method
+func Init() {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		start = time.Now()
+		status = ""
+		endpoint = req.URL.Path
+		serName = "post-srv"
+		method = req.Method
 
+	})
 }
 
 func Collect() {
