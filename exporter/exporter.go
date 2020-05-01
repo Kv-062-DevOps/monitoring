@@ -27,16 +27,16 @@ func RegisterMetrics() {
 }
 
 func Init(req *http.Request) {
-	start := time.Now()
-	status := ""
-	endpoint := req.URL.Path
-	serName := "post-srv"
-	method := req.Method
+	start = time.Now()
+	status = ""
+	endpoint = req.URL.Path
+	serName = "post-srv"
+	method = req.Method
 
 }
 
 func Collect() {
-	Init(*http.Request)
+	Init()
 	CounterVec.WithLabelValues(serName, method, endpoint, status).Inc()
 	HistogramVec.WithLabelValues(serName, endpoint).Observe(time.Since(start).Seconds())
 }
